@@ -1,0 +1,73 @@
+BEGIN TRANSACTION;
+DELETE FROM mg_meta WHERE schema_version = 1;
+INSERT INTO mg_meta (schema_version) VALUES (2);
+
+ALTER TABLE mg_raw_notes
+   ALTER COLUMN active SET NOT NULL,
+   ALTER COLUMN in_use SET NOT NULL,
+   ALTER COLUMN modified SET NOT NULL,
+   ALTER COLUMN nvt_name SET NOT NULL,
+   ALTER COLUMN nvt_oid SET NOT NULL,
+   ALTER COLUMN orphan SET NOT NULL,
+   ALTER COLUMN owner SET NOT NULL,
+   ALTER COLUMN text SET NOT NULL;
+ALTER TABLE mg_raw_overrides
+   ALTER COLUMN active SET NOT NULL,
+   ALTER COLUMN in_use SET NOT NULL,
+   ALTER COLUMN modified SET NOT NULL,
+   ALTER COLUMN new_severity SET NOT NULL,
+   ALTER COLUMN new_threat SET NOT NULL,
+   ALTER COLUMN nvt_name SET NOT NULL,
+   ALTER COLUMN nvt_oid SET NOT NULL,
+   ALTER COLUMN orphan SET NOT NULL,
+   ALTER COLUMN owner SET NOT NULL,
+   ALTER COLUMN text SET NOT NULL;
+ALTER TABLE mg_raw_tasks
+   ALTER COLUMN alterable SET NOT NULL,
+   ALTER COLUMN config_id SET NOT NULL,
+   ALTER COLUMN modified SET NOT NULL,
+   ALTER COLUMN name SET NOT NULL,
+   ALTER COLUMN owner SET NOT NULL,
+   ALTER COLUMN progress SET NOT NULL,
+   ALTER COLUMN report_count SET NOT NULL,
+   ALTER COLUMN status SET NOT NULL;
+ALTER TABLE mg_raw_reports
+   ALTER COLUMN findings_false_positive SET NOT NULL,
+   ALTER COLUMN findings_false_positive_full SET NOT NULL,
+   ALTER COLUMN findings_high SET NOT NULL,
+   ALTER COLUMN findings_high_full SET NOT NULL,
+   ALTER COLUMN findings_log SET NOT NULL,
+   ALTER COLUMN findings_log_full SET NOT NULL,
+   ALTER COLUMN findings_low SET NOT NULL,
+   ALTER COLUMN findings_low_full SET NOT NULL,
+   ALTER COLUMN findings_medium SET NOT NULL,
+   ALTER COLUMN findings_medium_full SET NOT NULL,
+   ALTER COLUMN modified SET NOT NULL,
+   ALTER COLUMN name SET NOT NULL,
+   ALTER COLUMN owner SET NOT NULL,
+   ALTER COLUMN progress SET NOT NULL,
+   ALTER COLUMN severity_filtered SET NOT NULL,
+   ALTER COLUMN severity_full SET NOT NULL,
+   ALTER COLUMN status SET NOT NULL,
+   ALTER COLUMN task_name SET NOT NULL,
+   ALTER COLUMN task_uuid SET NOT NULL,
+   ALTER COLUMN timezone SET NOT NULL;
+ALTER TABLE mg_raw_results
+   ALTER COLUMN host SET NOT NULL,
+   ALTER COLUMN modified SET NOT NULL,
+   ALTER COLUMN name SET NOT NULL,
+   ALTER COLUMN nvt_cvss_base_vector SET NOT NULL,
+   ALTER COLUMN nvt_family SET NOT NULL,
+   ALTER COLUMN nvt_name SET NOT NULL,
+   ALTER COLUMN nvt_oid SET NOT NULL,
+   ALTER COLUMN nvt_summary SET NOT NULL,
+   ALTER COLUMN nvt_tags SET NOT NULL,
+   ALTER COLUMN original_severity SET NOT NULL,
+   ALTER COLUMN original_threat SET NOT NULL,
+   ALTER COLUMN owner SET NOT NULL,
+   ALTER COLUMN port SET NOT NULL,
+   ALTER COLUMN qod_value SET NOT NULL,
+   ALTER COLUMN severity SET NOT NULL,
+   ALTER COLUMN threat SET NOT NULL;
+
+COMMIT TRANSACTION;
