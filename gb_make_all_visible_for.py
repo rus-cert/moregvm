@@ -4,7 +4,7 @@ import sys
 
 import moregvm
 
-from gvm.protocols.gmpv224 import EntityType, PermissionSubjectType
+from gvm.protocols.gmp.requests.v224 import EntityType, PermissionSubjectType
 from typing import Set
 
 PAGESIZE=25

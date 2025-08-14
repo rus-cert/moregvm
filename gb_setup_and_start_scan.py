@@ -5,8 +5,8 @@ import os
 
 import moregvm
 
-from gvm.protocols.gmpv224 import HostsOrdering
-from gvm.protocols.gmpv224 import AliveTest
+from gvm.protocols.gmp.requests.v224 import HostsOrdering
+from gvm.protocols.gmp.requests.v224 import AliveTest
 
 CONFIG_FILENAME = ".config/gb-tools-default-values.json"
 

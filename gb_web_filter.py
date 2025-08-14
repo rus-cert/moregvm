@@ -3,7 +3,7 @@ import sys
 
 import moregvm
 
-from gvm.protocols.gmpv224 import FilterType
+from gvm.protocols.gmp.requests.v224 import FilterType
 
 DEFAULT_FILTER_SETTINGS = {
     "alert": "b833a6f2-dcdc-4535-bfb0-a5154b5b5092",

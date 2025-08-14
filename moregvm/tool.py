@@ -6,7 +6,7 @@ import json
 import os
 import sys
 
-import gvm.protocols.gmpv224
+import gvm.protocols.gmp
 import gvm.connections
 import gvm.errors
 import gvm.transforms
@@ -19,7 +19,7 @@ class LazyTool(ABC):
     args: Dict[str, Any]
     user: Optional[str]
     gmp_hostname: Optional[str]
-    gmp: Optional[gvm.protocols.gmpv224.Gmp]
+    gmp: Optional[gvm.protocols.gmp.GMPv226]
 
     def __init__(self, args):
         self.args = args
@@ -49,7 +49,7 @@ class LazyTool(ABC):
 
         self.gmp_hostname = cred_json["hostname"]
         conn = gvm.connections.SSHConnection(hostname=self.gmp_hostname, timeout=self.args["gmp_timeout"])
-        gmp = gvm.protocols.gmpv224.Gmp(conn, transform=gvm.transforms.EtreeCheckCommandTransform())
+        gmp = gvm.protocols.gmp.GMPv226(conn, transform=gvm.transforms.EtreeCheckCommandTransform())
         gmp.connect()
         try:
             gmp.authenticate(self.user, cred_json["users"][self.user])
@@ -164,7 +164,7 @@ class LazyTool(ABC):
 
 class Tool(LazyTool):
     user: str
-    gmp: gvm.protocols.gmpv224.Gmp
+    gmp: gvm.protocols.gmp.GMPv226
     def __init__(self, args):
         super().__init__(args)
         self.connect()
