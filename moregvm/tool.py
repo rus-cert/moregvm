@@ -18,6 +18,7 @@ DEFAULT_TIMEOUT = 180
 class LazyTool(ABC):
     args: Dict[str, Any]
     user: Optional[str]
+    gmp_hostname: Optional[str]
     gmp: Optional[gvm.protocols.gmpv224.Gmp]
 
     def __init__(self, args):
@@ -46,7 +47,8 @@ class LazyTool(ABC):
         if self.user not in cred_json["users"]:
             raise moregvm.exceptions.PermanentError(f"unknown user {self.user}")
 
-        conn = gvm.connections.SSHConnection(hostname=cred_json["hostname"], timeout=self.args["gmp_timeout"])
+        self.gmp_hostname = cred_json["hostname"]
+        conn = gvm.connections.SSHConnection(hostname=self.gmp_hostname, timeout=self.args["gmp_timeout"])
         gmp = gvm.protocols.gmpv224.Gmp(conn, transform=gvm.transforms.EtreeCheckCommandTransform())
         gmp.connect()
         try:
@@ -56,7 +58,7 @@ class LazyTool(ABC):
             raise
         self.gmp = gmp
 
-    def output(self, *items):
+    def output(self, *items: object, sep=' '):
         """
         a simple output function
 
@@ -64,7 +66,7 @@ class LazyTool(ABC):
         output from other python code that calls the code (by extending
         the class and overriding this function).
         """
-        print(*items)
+        print(*items, sep=sep)
 
     def errprint(self, *args: object, sep=' ', end='\n') -> None:
         """print() but for stderr"""

@@ -74,12 +74,12 @@ class GbSetupAndStartScan(moregvm.Tool):
 
         task_id = task.attrib['id']
         started_task = self.gmp.start_task(task_id=task_id)
-
-        self.output("target id: ",target_id)
-        self.output("task id: ",task_id)
-
         report_id = started_task.find("./report_id").text
-        self.output("report id: ",report_id)
+
+        self.output("target", target_id, sep='\t')
+        self.output("task",   task_id,   sep='\t')
+        self.output("report", report_id, sep='\t')
+        self.output(f"(user {self.user}) https://{self.gmp_hostname}/report/{report_id}")
 
 if __name__ == '__main__':
     GbSetupAndStartScan.run_from_sysargs()
