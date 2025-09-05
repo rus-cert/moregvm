@@ -18,8 +18,7 @@ status=False
 DEFAULT_FILTERSTRING = "apply_overrides=1 sort=created rows=-1 notes=0 overrides=0"
 
 DEFAULT_COLUMNS = {
-    "task": ["uuid", "name", "severity"],
-    "report": ["uuid", "name", "severity_full"]
+    "result": ["uuid", "host", "port", "severity", "name"],
 }
 
 class GbQueryReport(moregvm.LazyTool):
@@ -31,6 +30,9 @@ class GbQueryReport(moregvm.LazyTool):
         * a task name (with -t/--task)
         * a path (with -f/--file)
         * '-' for standard input (with -f/--file)
+
+    Refer to the results columns listed in "gb_querytool --help" for a list
+    of possible columns.
 
     Examples:
         $ gb_query_report 5e4554ea-df35-45f4-8637-d14f1634466d name,severity
@@ -49,6 +51,7 @@ class GbQueryReport(moregvm.LazyTool):
         parser.add_argument("-t", "--task", help="Use task name instead of a report UUID", action="store_true")
         parser.add_argument("--fenced", help="Fence in the output with a type line and a 'LAST' line", action="store_true")
         parser.add_argument("--experimental", help=argparse.SUPPRESS, action="store_true")
+        parser.add_argument("--all", help="Output ALL available columns", action="store_true")
         parser.add_argument("--format", default="csv", help="Output format", choices=moregvm.output_obj_names)
 
     def tool_main(self) -> None:
@@ -72,10 +75,17 @@ class GbQueryReport(moregvm.LazyTool):
             self.errprint('WARNING: EXPERIMENTAL features are enabled. Semantics are subject to change and'
                     + ' the identical command line may fail in the future.')
         if not len(col_names):
-            if not self.args["experimental"]:
-                raise NotImplementedError('ERROR: Calling gb_query_report without a list of columns is'
-                        + ' EXPERIMENTAL. If you really want to go ahead, pass "--experimental".')
-            col_names = DEFAULT_COLUMNS["result"]
+            if not (self.args["experimental"] or self.args["all"]):
+                raise moregvm.PermanentError('ERROR: Calling gb_querytool without a list of columns is'
+                        + ' EXPERIMENTAL. If you really want to go ahead, pass "--experimental" or "--all".')
+            if self.args["all"]:
+                col_names = available_cols.keys()
+            else:
+                col_names = DEFAULT_COLUMNS["result"]
+        else:
+            if self.args["all"]:
+                raise moregvm.PermanentError('ERROR: You cannot specify a list of columns and pass "--all"'
+                        + ' at the same time.')
         for col in col_names:
             if col not in available_cols:
                 raise moregvm.PermanentError(f'ERROR: Unknown column type "{col}"')

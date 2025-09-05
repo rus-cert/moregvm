@@ -3,10 +3,11 @@
 import argparse
 import collections
 import sys
+import textwrap
 
 import moregvm
 
-from typing import Dict
+from typing import Dict, Optional
 
 # Globals
 debug=False
@@ -15,15 +16,29 @@ status=False
 
 DEFAULT_COLUMNS = {
     "task": ["uuid", "name", "severity"],
-    "report": ["uuid", "name", "severity_full"]
+    "report": ["uuid", "name", "task_name", "status", "severity_filtered"],
+    "result": ["uuid", "host", "port", "severity", "name"],
+    "note": ["uuid", "created", "owner", "nvt_oid", "hosts"],
+    "override": ["uuid", "created", "owner", "new_severity", "nvt_oid", "hosts"],
+    "target": ["uuid", "name", "alive_tests", "hosts"],
+    "config": ["uuid", "owner", "writable", "in_use", "name"],
+    "filter": ["uuid", "type", "name", "term"],
+    "tag": ["uuid", "owner", "name"],
+    "user": ["uuid", "created", "name", "owner"],
+    "group": ["uuid", "created", "name", "owner"],
+    "role": ["uuid", "created", "name", "owner"],
+    "permission": ["uuid", "subject_type", "subject_name", "resource_type", "resource_uuid"],
 }
 
 class GbQuerytool(moregvm.Tool):
     """
     Run a search in greenbone
 
+    Available columns per type:[PLACEHOLDER]
+
     Examples:
-        $ gb_querytool report "name~uni-230601-UST" name,severity
+        $ gb_querytool --user=autoscan report "task~RUS-CERT" uuid,task_name,severity_filtered
+        $ gb_querytool results 'severity=10' host,port,name
     """
 
     @classmethod
@@ -36,9 +51,19 @@ class GbQuerytool(moregvm.Tool):
         parser.add_argument("-d", "--debug", help="Print debugging messages", action="store_true")
         parser.add_argument("--fenced", help="Fence in the output with a type line and a 'LAST' line", action="store_true")
         parser.add_argument("--experimental", help=argparse.SUPPRESS, action="store_true")
-        parser.add_argument("--all", help=argparse.SUPPRESS, action="store_true")
+        parser.add_argument("--all", help="Output ALL available columns", action="store_true")
         parser.add_argument("--format", default="csv", help="Output format", choices=moregvm.output_obj_names)
         parser.add_argument("--pagesize", default=None, help="pagination size")
+
+    @classmethod
+    def help_epilog(cls) -> Optional[str]:
+        text = ''
+        global_colnames = moregvm.GLOBAL_COLUMNS.keys()
+        for restype in moregvm.COLUMNS:
+            colnames = moregvm.COLUMNS[restype].keys()
+            line = f"{restype}: {' '.join(global_colnames)} {' '.join(colnames)}"
+            text += "\n" + textwrap.fill(line, width=100, initial_indent=' '*2, subsequent_indent=' '*4)
+        return super().help_epilog().replace('[PLACEHOLDER]', text)
 
     def tool_main(self) -> None:
         global debug, quiet, status
@@ -63,13 +88,17 @@ class GbQuerytool(moregvm.Tool):
             self.errprint('WARNING: EXPERIMENTAL features are enabled. Semantics are subject to change and'
                     + ' the identical command line may fail in the future.')
         if not len(col_names):
-            if not self.args["experimental"]:
-                raise NotImplementedError('ERROR: Calling gb_querytool without a list of columns is'
-                        + ' EXPERIMENTAL. If you really want to go ahead, pass "--experimental".')
+            if not (self.args["experimental"] or self.args["all"]):
+                raise moregvm.PermanentError('ERROR: Calling gb_querytool without a list of columns is'
+                        + ' EXPERIMENTAL. If you really want to go ahead, pass "--experimental" or "--all".')
             if self.args["all"]:
-                col_names = available_cols
+                col_names = available_cols.keys()
             else:
                 col_names = DEFAULT_COLUMNS[resource_type]
+        else:
+            if self.args["all"]:
+                raise moregvm.PermanentError('ERROR: You cannot specify a list of columns and pass "--all"'
+                        + ' at the same time.')
         for col in col_names:
             if col not in available_cols:
                 raise moregvm.PermanentError(f'ERROR: Unknown column type "{col}"')
