@@ -58,6 +58,24 @@ Example:
     $ gb_db_init
 ```
 
+## gb_db_migrate
+```
+usage: gb_db_migrate.py [-h] [--user USER] version
+
+This script migrates the db from VERSION-1 to VERSION
+using migration-VERSION.sql
+
+positional arguments:
+  version      Version to migrate to
+
+options:
+  -h, --help   show this help message and exit
+  --user USER  Greenbone username
+
+Example:
+    $ gb_db_migrate 42
+```
+
 ## gb_delete_old
 ```
 usage: gb_delete_old.py [-h] [--user USER] prefix days
@@ -182,7 +200,7 @@ Example:
 ## gb_query_report
 ```
 usage: gb_query_report.py [-h] [--user USER] [-q] [-d] [-f] [-t] [--fenced]
-                          [--format {csv,csvnohead,json,jsonl,raw}]
+                          [--all] [--format {csv,csvnohead,json,jsonl,raw}]
                           report [columns]
 
 Get results from a report
@@ -199,6 +217,7 @@ options:
   -f, --file            Read the report locally from a file
   -t, --task            Use task name instead of a report UUID
   --fenced              Fence in the output with a type line and a 'LAST' line
+  --all                 Output ALL available columns
   --format {csv,csvnohead,json,jsonl,raw}
                         Output format
 
@@ -208,6 +227,9 @@ The 'report' argument is to be specified as:
     * a path (with -f/--file)
     * '-' for standard input (with -f/--file)
 
+Refer to the results columns listed in "gb_querytool --help" for a list
+of possible columns.
+
 Examples:
     $ gb_query_report 5e4554ea-df35-45f4-8637-d14f1634466d name,severity
     $ gb_query_report -f ./export.xml name,severity
@@ -216,7 +238,7 @@ Examples:
 
 ## gb_querytool
 ```
-usage: gb_querytool.py [-h] [--user USER] [-q] [-d] [--fenced]
+usage: gb_querytool.py [-h] [--user USER] [-q] [-d] [--fenced] [--all]
                        [--format {csv,csvnohead,json,jsonl,raw}]
                        [--pagesize PAGESIZE]
                        resource_type filter [columns]
@@ -234,12 +256,43 @@ options:
   -q, --quiet           Suppress progress indication
   -d, --debug           Print debugging messages
   --fenced              Fence in the output with a type line and a 'LAST' line
+  --all                 Output ALL available columns
   --format {csv,csvnohead,json,jsonl,raw}
                         Output format
   --pagesize PAGESIZE   pagination size
 
+Available columns per type:
+  task: uuid created modified owner name alterable comment severity status progress config_id
+    report_count report_uuid findings_high findings_medium findings_low findings_log
+    findings_false_positive
+  report: uuid created modified owner name comment severity_full severity_filtered status progress
+    task_uuid task_name scan_start scan_end timezone findings_high findings_medium findings_low
+    findings_log findings_false_positive findings_high_full findings_medium_full findings_low_full
+    findings_log_full findings_false_positive_full
+  result: uuid created modified owner name comment detection_product detection_method detection_oid
+    host hostname port nvt_oid nvt_name nvt_family nvt_tags nvt_solution nvt_cvss_base_vector
+    nvt_summary nvt_insight nvt_affected nvt_impact nvt_vuldetect nvt_solution_type threat severity
+    original_threat original_severity qod_value description
+  note: uuid created modified owner text nvt_oid nvt_name hosts location active in_use orphan
+    task_uuid result_uuid
+  override: uuid created modified owner text nvt_oid nvt_name hosts location severity new_threat
+    new_severity end_time active in_use orphan task_uuid result_uuid
+  target: uuid created modified owner name comment hosts exclude_hosts writable
+    allow_simultaneous_ips alive_tests
+  config: uuid created modified owner name comment writable in_use family_count family_count_growing
+    nvt_count nvt_count_growing
+  report_format: uuid created modified owner name summary description extension content_type
+  filter: uuid created modified owner name comment term type
+  tag: uuid created modified owner name comment resource_type resource_count active
+  user: uuid created modified owner name comment
+  group: uuid created modified owner name comment
+  role: uuid created modified owner name comment
+  permission: uuid created modified owner name comment resource_uuid resource_type resource_name
+    subject_uuid subject_type subject_name
+
 Examples:
-    $ gb_querytool report "name~uni-230601-UST" name,severity
+    $ gb_querytool --user=autoscan report "task~RUS-CERT" uuid,task_name,severity_filtered
+    $ gb_querytool results 'severity=10' host,port,name
 ```
 
 ## gb_report_status
@@ -326,8 +379,7 @@ Example:
 ## gb_web_filter
 ```
 usage: gb_web_filter.py [-h] [--user USER] [--verbose]
-                        {list,show,create,update,create-or-update,delete,get-default-filter,set-default-filter,unset-default-filter}
-                        ...
+                        {list,show,create,update,create-or-update,delete,get-default-filter,set-default-filter,unset-default-filter} ...
 
 This script interacts with the stored filters in the greenbone web
 interface.
