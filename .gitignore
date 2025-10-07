@@ -1,5 +1,9 @@
-__pycache__
 generate_README
 reset_dev_db
-moregvm-testing-script
-db_nullable_check
+
+__pycache__/
+*.py[codz]
+
+dist/
+sdist/
+*.egg-info/

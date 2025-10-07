@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moregvm"
+dynamic = ["version"]
+requires-python = ">=3.11"
+dependencies = [
+    "python-gvm >= 25.0.0",
+    "psycopg2 >= 2.9.5",
+]
+
+[project.scripts]
+gb_db_import             = "moregvm.tools.gb_db_import:GbDbImport.run_from_sysargs"
+gb_db_import_results     = "moregvm.tools.gb_db_import_results:GbDbImportResults.run_from_sysargs"
+gb_db_init               = "moregvm.tools.gb_db_init:GbDbInit.run_from_sysargs"
+gb_db_migrate            = "moregvm.tools.gb_db_migrate:GbDbMigrate.run_from_sysargs"
+gb_delete_old            = "moregvm.tools.gb_delete_old:GbDeleteOld.run_from_sysargs"
+gb_delete_report         = "moregvm.tools.gb_delete_report:GbDeleteReport.run_from_sysargs"
+gb_download_report       = "moregvm.tools.gb_download_report:GbDownloadReport.run_from_sysargs"
+gb_export_ips            = "moregvm.tools.gb_export_ips:GbExportIps.run_from_sysargs"
+gb_get_report_format_ids = "moregvm.tools.gb_get_report_format_ids:GbGetReportFormatIds.run_from_sysargs"
+gb_make_all_visible_for  = "moregvm.tools.gb_make_all_visible_for:GbMakeAllVisibleFor.run_from_sysargs"
+gb_query_report          = "moregvm.tools.gb_query_report:GbQueryReport.run_from_sysargs"
+gb_querytool             = "moregvm.tools.gb_querytool:GbQuerytool.run_from_sysargs"
+gb_report_status         = "moregvm.tools.gb_report_status:GbReportStatus.run_from_sysargs"
+gb_setup_and_start_scan  = "moregvm.tools.gb_setup_and_start_scan:GbSetupAndStartScan.run_from_sysargs"
+gb_status_summary        = "moregvm.tools.gb_status_summary:GbStatusSummary.run_from_sysargs"
+gb_task_status           = "moregvm.tools.gb_task_status:GbTaskStatus.run_from_sysargs"
+gb_web_filter            = "moregvm.tools.gb_web_filter:GbWebFilter.run_from_sysargs"
+
+[tool.setuptools.dynamic]
+version = {attr = "moregvm.__version__"}
