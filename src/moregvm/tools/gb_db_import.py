@@ -78,14 +78,14 @@ class GbDbImport(moregvm.Tool):
                 # we checked that there's a result in the 'match' so the cast() is safe
                 username_id = cast(tuple[int], curs.fetchone())[0]
                 conn.commit()
-              
+
                 sync_data_query = sql.SQL(
                         "INSERT INTO mg_syncdata_{resource_type}s (sync_user) VALUES (%s) RETURNING id").format(
                                 resource_type = sql.SQL(resource_type),
                         )
                 curs.execute(sync_data_query, (username_id,))
                 # if the INSERT above didn't raise an exception, there will be a value, so the cast() is safe
-                syncdata_id = cast(tuple[int], curs.fetchone())[0] 
+                syncdata_id = cast(tuple[int], curs.fetchone())[0]
 
                 temp_query = sql.SQL(
                             """ CREATE TEMPORARY TABLE incoming_mg_{resource_type}s
@@ -170,4 +170,3 @@ class GbDbImport(moregvm.Tool):
 
 if __name__ == '__main__':
     GbDbImport.run_from_sysargs()
-

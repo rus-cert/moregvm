@@ -21,7 +21,7 @@ class GbGetReportFormatIds(moregvm.Tool):
         report_format_extensions = report_format.findall('./')
 
         # iterates through elements
-        # nested JSON 
+        # nested JSON
         with open("/home/tools/.config/gb-tools-report-format-ids_v2.json", "w") as f:
             for ids in report_format_ids:
                 id_type = {}

@@ -101,7 +101,7 @@ class GbDbImportResults(moregvm.Tool):
                                                moregvm.COLUMNS["report"]["progress"].extract(report)))
 
                 # if the INSERT above didn't raise an exception, there will be a value, so the cast() is safe
-                syncdata_id = cast(tuple[int], curs.fetchone())[0] 
+                syncdata_id = cast(tuple[int], curs.fetchone())[0]
 
                 temp_query =""" CREATE TEMPORARY TABLE incoming_mg_results (
                                     uuid UUID NOT NULL,
@@ -225,7 +225,7 @@ class GbDbImportResults(moregvm.Tool):
                             SET sync_vanished = {syncdata_id}
                             FROM (
                                 SELECT {fields} FROM mg_raw_results
-                                    WHERE sync_vanished IS NULL 
+                                    WHERE sync_vanished IS NULL
                                     AND sync_user = {username_id}
                                     AND report_uuid = {report_uuid}
                                 EXCEPT
@@ -252,7 +252,7 @@ class GbDbImportResults(moregvm.Tool):
                                 SELECT {fields} FROM incoming_mg_results
                                 EXCEPT
                                 SELECT {fields} FROM mg_raw_results
-                                    WHERE sync_vanished IS NULL 
+                                    WHERE sync_vanished IS NULL
                                     AND sync_user = {username_id}
                                     AND report_uuid = {report_uuid}
                             ) nested_query

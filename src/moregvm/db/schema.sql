@@ -7,147 +7,147 @@ INSERT INTO mg_meta (schema_version) VALUES (6);
 
 ----- mg_users: Every entry is associated with a user -----
 CREATE TABLE mg_users (
-	id SERIAL PRIMARY KEY,
-	name TEXT UNIQUE NOT NULL
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL
 );
 
 ----- Syncdata tables: When was each entry synchronized? -----
 CREATE TABLE mg_syncdata_notes (
-	id BIGSERIAL PRIMARY KEY,
-	date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id)
+    id BIGSERIAL PRIMARY KEY,
+    date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id)
 );
 
 CREATE TABLE mg_syncdata_overrides (
-	id BIGSERIAL PRIMARY KEY,
-	date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id)
+    id BIGSERIAL PRIMARY KEY,
+    date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id)
 );
 
 CREATE TABLE mg_syncdata_tasks (
-	id BIGSERIAL PRIMARY KEY,
-	date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id)
+    id BIGSERIAL PRIMARY KEY,
+    date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id)
 );
 
 CREATE TABLE mg_syncdata_reports (
-	id BIGSERIAL PRIMARY KEY,
-	date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id)
+    id BIGSERIAL PRIMARY KEY,
+    date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id)
 );
 
 CREATE TABLE mg_syncdata_results (
-	id BIGSERIAL PRIMARY KEY,
-	date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id),
-	report_uuid UUID NOT NULL,
-	report_modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	report_status TEXT NOT NULL,
-	report_progress INTEGER NOT NULL
+    id BIGSERIAL PRIMARY KEY,
+    date TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW() NOT NULL,
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id),
+    report_uuid UUID NOT NULL,
+    report_modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    report_status TEXT NOT NULL,
+    report_progress INTEGER NOT NULL
 );
 
 ----- Content tables -----
 CREATE TABLE mg_raw_notes (
-	id BIGSERIAL PRIMARY KEY,
-	sync_found BIGINT NOT NULL REFERENCES mg_syncdata_notes(id),
-	sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_notes(id),
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id),
-	uuid UUID NOT NULL,
-	created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	owner TEXT NOT NULL,
-	text TEXT NOT NULL,
-	nvt_oid TEXT NOT NULL,
-	nvt_name TEXT NOT NULL,
-	hosts TEXT,
-	location TEXT,
-	active BOOLEAN NOT NULL,
-	in_use BOOLEAN NOT NULL,
-	orphan BOOLEAN NOT NULL,
-	task_uuid UUID,
-	result_uuid UUID
+    id BIGSERIAL PRIMARY KEY,
+    sync_found BIGINT NOT NULL REFERENCES mg_syncdata_notes(id),
+    sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_notes(id),
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id),
+    uuid UUID NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    owner TEXT NOT NULL,
+    text TEXT NOT NULL,
+    nvt_oid TEXT NOT NULL,
+    nvt_name TEXT NOT NULL,
+    hosts TEXT,
+    location TEXT,
+    active BOOLEAN NOT NULL,
+    in_use BOOLEAN NOT NULL,
+    orphan BOOLEAN NOT NULL,
+    task_uuid UUID,
+    result_uuid UUID
 );
 
 CREATE TABLE mg_raw_overrides (
-	id BIGSERIAL PRIMARY KEY,
-	sync_found BIGINT NOT NULL REFERENCES mg_syncdata_overrides(id),
-	sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_overrides(id),
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id),
-	uuid UUID NOT NULL,
-	created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	owner TEXT NOT NULL,
-	text TEXT NOT NULL,
-	nvt_oid TEXT NOT NULL,
-	nvt_name TEXT NOT NULL,
-	hosts TEXT,
-	location TEXT,
-	severity REAL,
-	new_threat TEXT NOT NULL,
-	new_severity REAL NOT NULL,
-	end_time TIMESTAMP WITHOUT TIME ZONE,
-	active BOOLEAN NOT NULL,
-	in_use BOOLEAN NOT NULL,
-	orphan BOOLEAN NOT NULL,
-	task_uuid UUID,
-	result_uuid UUID
+    id BIGSERIAL PRIMARY KEY,
+    sync_found BIGINT NOT NULL REFERENCES mg_syncdata_overrides(id),
+    sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_overrides(id),
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id),
+    uuid UUID NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    owner TEXT NOT NULL,
+    text TEXT NOT NULL,
+    nvt_oid TEXT NOT NULL,
+    nvt_name TEXT NOT NULL,
+    hosts TEXT,
+    location TEXT,
+    severity REAL,
+    new_threat TEXT NOT NULL,
+    new_severity REAL NOT NULL,
+    end_time TIMESTAMP WITHOUT TIME ZONE,
+    active BOOLEAN NOT NULL,
+    in_use BOOLEAN NOT NULL,
+    orphan BOOLEAN NOT NULL,
+    task_uuid UUID,
+    result_uuid UUID
 );
 
 CREATE TABLE mg_raw_tasks (
-	id BIGSERIAL PRIMARY KEY,
-	sync_found BIGINT NOT NULL REFERENCES mg_syncdata_tasks(id),
-	sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_tasks(id),
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id),
-	uuid UUID NOT NULL,
-	created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	owner TEXT NOT NULL,
-	name TEXT NOT NULL,
-	alterable BOOLEAN NOT NULL,
-	comment TEXT,
-	severity REAL,
-	status TEXT NOT NULL,
-	progress INTEGER NOT NULL,
-	config_id UUID,
-	report_count INTEGER NOT NULL,
-	report_uuid UUID,
-	findings_high INTEGER,
-	findings_medium INTEGER,
-	findings_low INTEGER,
-	findings_log INTEGER,
-	findings_false_positive INTEGER
+    id BIGSERIAL PRIMARY KEY,
+    sync_found BIGINT NOT NULL REFERENCES mg_syncdata_tasks(id),
+    sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_tasks(id),
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id),
+    uuid UUID NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    owner TEXT NOT NULL,
+    name TEXT NOT NULL,
+    alterable BOOLEAN NOT NULL,
+    comment TEXT,
+    severity REAL,
+    status TEXT NOT NULL,
+    progress INTEGER NOT NULL,
+    config_id UUID,
+    report_count INTEGER NOT NULL,
+    report_uuid UUID,
+    findings_high INTEGER,
+    findings_medium INTEGER,
+    findings_low INTEGER,
+    findings_log INTEGER,
+    findings_false_positive INTEGER
 );
 
 CREATE TABLE mg_raw_reports (
-	id BIGSERIAL PRIMARY KEY,
-	sync_found BIGINT NOT NULL REFERENCES mg_syncdata_reports(id),
-	sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_reports(id),
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id),
-	uuid UUID NOT NULL,
-	created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	owner TEXT NOT NULL,
-	name TEXT NOT NULL,
-	comment TEXT,
-	severity_full REAL NOT NULL,
-	severity_filtered REAL NOT NULL,
-	status TEXT NOT NULL,
-	progress INTEGER NOT NULL,
-	task_uuid UUID NOT NULL,
-	task_name TEXT NOT NULL,
-	scan_start TIMESTAMP WITHOUT TIME ZONE,
-	scan_end TIMESTAMP WITHOUT TIME ZONE,
-	timezone TEXT NOT NULL,
-	findings_high INTEGER NOT NULL,
-	findings_medium INTEGER NOT NULL,
-	findings_low INTEGER NOT NULL,
-	findings_log INTEGER NOT NULL,
-	findings_false_positive INTEGER NOT NULL,
-	findings_high_full INTEGER NOT NULL,
-	findings_medium_full INTEGER NOT NULL,
-	findings_low_full INTEGER NOT NULL,
-	findings_log_full INTEGER NOT NULL,
-	findings_false_positive_full INTEGER NOT NULL
+    id BIGSERIAL PRIMARY KEY,
+    sync_found BIGINT NOT NULL REFERENCES mg_syncdata_reports(id),
+    sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_reports(id),
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id),
+    uuid UUID NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    owner TEXT NOT NULL,
+    name TEXT NOT NULL,
+    comment TEXT,
+    severity_full REAL NOT NULL,
+    severity_filtered REAL NOT NULL,
+    status TEXT NOT NULL,
+    progress INTEGER NOT NULL,
+    task_uuid UUID NOT NULL,
+    task_name TEXT NOT NULL,
+    scan_start TIMESTAMP WITHOUT TIME ZONE,
+    scan_end TIMESTAMP WITHOUT TIME ZONE,
+    timezone TEXT NOT NULL,
+    findings_high INTEGER NOT NULL,
+    findings_medium INTEGER NOT NULL,
+    findings_low INTEGER NOT NULL,
+    findings_log INTEGER NOT NULL,
+    findings_false_positive INTEGER NOT NULL,
+    findings_high_full INTEGER NOT NULL,
+    findings_medium_full INTEGER NOT NULL,
+    findings_low_full INTEGER NOT NULL,
+    findings_log_full INTEGER NOT NULL,
+    findings_false_positive_full INTEGER NOT NULL
 );
 
 -- The *_e_* tables hold a few columns (e)xternally for deduplication
@@ -197,30 +197,30 @@ CREATE UNIQUE INDEX ON mg_raw_results_e_nvt (
 );
 
 CREATE TABLE mg_raw_results (
-	id BIGSERIAL PRIMARY KEY,
-	sync_found BIGINT NOT NULL REFERENCES mg_syncdata_results(id),
-	sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_results(id),
-	sync_user INTEGER NOT NULL REFERENCES mg_users(id),
-	uuid UUID NOT NULL,
-	created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-	owner TEXT NOT NULL,
-	name TEXT NOT NULL,
-	comment TEXT,
-	host INET NOT NULL,
-	hostname TEXT,
-	port TEXT NOT NULL,
-	threat TEXT NOT NULL,
-	severity REAL NOT NULL,
-	original_threat TEXT NOT NULL,
-	original_severity REAL NOT NULL,
-	qod_value SMALLINT NOT NULL,
-	report_uuid UUID NOT NULL,
-	e_description_id BIGINT REFERENCES mg_raw_results_e_description(id),
-	e_nvt_id BIGINT NOT NULL REFERENCES mg_raw_results_e_nvt(id),
-	detection_product TEXT,
-	detection_method TEXT,
-	detection_oid TEXT
+    id BIGSERIAL PRIMARY KEY,
+    sync_found BIGINT NOT NULL REFERENCES mg_syncdata_results(id),
+    sync_vanished BIGINT DEFAULT NULL REFERENCES mg_syncdata_results(id),
+    sync_user INTEGER NOT NULL REFERENCES mg_users(id),
+    uuid UUID NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    modified TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    owner TEXT NOT NULL,
+    name TEXT NOT NULL,
+    comment TEXT,
+    host INET NOT NULL,
+    hostname TEXT,
+    port TEXT NOT NULL,
+    threat TEXT NOT NULL,
+    severity REAL NOT NULL,
+    original_threat TEXT NOT NULL,
+    original_severity REAL NOT NULL,
+    qod_value SMALLINT NOT NULL,
+    report_uuid UUID NOT NULL,
+    e_description_id BIGINT REFERENCES mg_raw_results_e_description(id),
+    e_nvt_id BIGINT NOT NULL REFERENCES mg_raw_results_e_nvt(id),
+    detection_product TEXT,
+    detection_method TEXT,
+    detection_oid TEXT
 );
 
 CREATE INDEX ON mg_raw_results (

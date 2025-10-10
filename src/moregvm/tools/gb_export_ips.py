@@ -43,4 +43,3 @@ class GbExportIps(moregvm.Tool):
 
 if __name__ == '__main__':
     GbExportIps.run_from_sysargs()
-
