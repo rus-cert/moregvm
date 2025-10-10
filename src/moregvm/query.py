@@ -1,67 +1,68 @@
-import moregvm
 import csv
 import json
-import lxml.etree
-
 from abc import ABC, abstractmethod
-from typing import Dict, Set, Iterator
+from typing import Any, Iterator, TextIO
+
+import gvm.xml
+
+import moregvm.tool
 
 FALLBACK_PAGE_SIZE = 25
 
 DEFAULT_PAGE_SIZES = {
-    "note":       200,
-    "override":    50,
-    "permission":  50,
-    "result":     200,
-    "target":      50,
-    "task":        50,
+    "note": 200,
+    "override": 50,
+    "permission": 50,
+    "result": 200,
+    "target": 50,
+    "task": 50,
 }
 
 class AbstractOutput(ABC):
     @abstractmethod
-    def start(self, out, colnames):
+    def start(self, out: TextIO, colnames: list[str]) -> None:
         ...
     @abstractmethod
-    def record(self, record):
+    def record(self, record: dict[str, Any]) -> None:
         ...
-    def end(self):
+    def end(self) -> None:
         pass
 
 class JSONOutput(AbstractOutput):
-    def start(self, out, colnames):
+    def start(self, out: TextIO, colnames: list[str]) -> None:
         self.out = out
         self.started=False
         print("[", end='', file=self.out)
-    def record(self, record):
+    def record(self, record: dict[str, Any]) -> None:
         if self.started:
             print(",", end='', file=self.out)
         self.started=True
         json.dump(record, self.out)
-    def end(self):
+    def end(self) -> None:
         print("]", file=self.out)
-        
+
 class JSONLOutput(AbstractOutput):
-    def start(self, out, colnames):
+    def start(self, out: TextIO, colnames: list[str]) -> None:
         self.out = out
-    def record(self, record):
+    def record(self, record: dict[str, Any]) -> None:
         json.dump(record, self.out)
         print("", file=self.out)
-        
+
 class CSVNoHeaderOutput(AbstractOutput):
-    def start(self, out, colnames):
+    def start(self, out: TextIO, colnames: list[str]) -> None:
         self.writer = csv.DictWriter(out, colnames)
-    def record(self, record):
+    def record(self, record: dict[str, Any]) -> None:
         self.writer.writerow(record)
-        
+
 class CSVOutput(CSVNoHeaderOutput):
-    def start(self, out, colnames):
+    def start(self, out: TextIO, colnames: list[str]) -> None:
         super().start(out, colnames)
         self.writer.writeheader()
-        
+
 class RawOutput(AbstractOutput):
-    def start(self, out, colnames):
+    def start(self, out: TextIO, colnames: list[str]) -> None:
         self.out = out
-    def record(self, record):
+    def record(self, record: dict[str, Any]) -> None:
         for column in record:
             print(record[column], file=self.out)
 
@@ -81,10 +82,16 @@ def output_obj_by_name(name: str) -> AbstractOutput:
         case _:
             raise RuntimeError(f"Output format {name} is unknown")
 
+
 def resources_gen(
-        tool: moregvm.Tool, restype: str, filter: str,
-        options: Dict[str, object], page_size = None,
-        debug = False, status = False) -> Iterator[lxml.etree._Element]:
+    tool: moregvm.tool.Tool,
+    restype: str,
+    filter: str,
+    options: dict[str, object],
+    page_size: int | None = None,
+    debug: bool = False,
+    status: bool = False,
+) -> Iterator[gvm.xml.Element]:
     if page_size == None:
         if restype in DEFAULT_PAGE_SIZES:
             page_size = DEFAULT_PAGE_SIZES[restype]

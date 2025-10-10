@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import sys
 
-import moregvm
+from gvm.protocols.gmp.requests.v226 import FilterType
 
-from gvm.protocols.gmp.requests.v224 import FilterType
+import moregvm
 
 DEFAULT_FILTER_SETTINGS = {
     "alert": "b833a6f2-dcdc-4535-bfb0-a5154b5b5092",
@@ -36,7 +36,7 @@ DEFAULT_FILTER_SETTINGS = {
     "tlscertificate": "34a176c1-0278-4c29-b84d-3d72117b2169",
     "user": "a33635be-7263-4549-bd80-c04d2dba89b4",
     "vulnerability": "17c9d269-95e7-4bfa-b1b2-bc106a2175c7",
-};
+}
 
 ERRMSG_UNKNOWN_TYPE = "Invalid filter type."
 ERRMSG_UNKNOWN_FILTER = "Filter not found."
@@ -83,7 +83,7 @@ class GbWebFilter(moregvm.Tool):
         create_parser.add_argument( "filter_type", help="the type of filter to be created" )
         create_parser.add_argument( "filter_name", help="the name of the new filter" )
         create_parser.add_argument( "filter_string", help="the filter string to be set" )
-        
+
         update_parser = subparsers.add_parser("update", help="update a filter")
         update_parser.add_argument( "filter_type", help="the type of filter to be updated" )
         update_parser.add_argument( "filter_name", help="the name of the filter to be updated" )
@@ -150,7 +150,7 @@ class GbWebFilter(moregvm.Tool):
                         raise moregvm.PermanentError("Name already in use.")
                 else:
                     raise moregvm.PermanentError(ERRMSG_UNKNOWN_TYPE)
-            
+
             case 'update':
                 if self.args["filter_type"] in filter_types:
                     response = self.gmp.get_filters(filter_string=f"type={self.args['filter_type']} and name=\"{self.args['filter_name']}\"")

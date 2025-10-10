@@ -2,24 +2,24 @@
 
 import argparse
 import collections
-import gvm.errors
 import sys
-import xml.etree.ElementTree as ET
+
+import gvm.errors
+import lxml.etree
 
 import moregvm
 
-from typing import Dict
-
 # Globals
-debug=False
-quiet=False
-status=False
+debug = False
+quiet = False
+status = False
 
 DEFAULT_FILTERSTRING = "apply_overrides=1 sort=created rows=-1 notes=0 overrides=0"
 
 DEFAULT_COLUMNS = {
     "result": ["uuid", "host", "port", "severity", "name"],
 }
+
 
 class GbQueryReport(moregvm.LazyTool):
     """
@@ -100,9 +100,9 @@ class GbQueryReport(moregvm.LazyTool):
         if self.args["file"]:
             try:
                 if self.args["report"] == "-":
-                    xml_file = ET.parse(sys.stdin)
+                    xml_file = lxml.etree.parse(sys.stdin)
                 else:
-                    xml_file = ET.parse(self.args["report"])
+                    xml_file = lxml.etree.parse(self.args["report"])
             except OSError as ex:
                 raise moregvm.PermanentError(f"{ex.strerror}: '{ex.filename}'")
             results = xml_file.findall('./report/results/result')
@@ -139,6 +139,6 @@ class GbQueryReport(moregvm.LazyTool):
         output.end()
         if self.args["fenced"]: self.output(f'LAST')
 
+
 if __name__ == '__main__':
     GbQueryReport.run_from_sysargs()
-

@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-from typing import Dict
-
 import moregvm
 
-PAGESIZE=25
+PAGESIZE = 25
+
 
 class GbStatusSummary(moregvm.Tool):
     """
@@ -19,8 +18,8 @@ class GbStatusSummary(moregvm.Tool):
     @classmethod
     def toggles(cls):
         return {
-            "all":  "Shows all reports including those that are Done",
-            "list": "Print a list rather than a count"
+            "all": "Shows all reports including those that are Done",
+            "list": "Print a list rather than a count",
         }
 
     def tool_main(self) -> None:
@@ -34,7 +33,7 @@ class GbStatusSummary(moregvm.Tool):
         totalcount_resp = self.gmp.get_reports(filter_string='rows=1 ' + filter_string)
         totalcount = int(totalcount_resp.find("./report_count/filtered").text)
 
-        count: Dict[str, int] = {}
+        count: dict[str, int] = {}
 
         pos = 1
         tcnt_errmsg = ''
@@ -65,6 +64,7 @@ class GbStatusSummary(moregvm.Tool):
 
         if tcnt_errmsg:
             raise moregvm.TemporaryError(f'Total count changed from {totalcount}{tcnt_errmsg} during execution. Results are probably inconsistent.')
+
 
 if __name__ == "__main__":
     GbStatusSummary.run_from_sysargs()

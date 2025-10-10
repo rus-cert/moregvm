@@ -7,12 +7,10 @@ import textwrap
 
 import moregvm
 
-from typing import Dict, Optional
-
 # Globals
-debug=False
-quiet=False
-status=False
+debug = False
+quiet = False
+status = False
 
 DEFAULT_COLUMNS = {
     "task": ["uuid", "name", "severity"],
@@ -56,14 +54,15 @@ class GbQuerytool(moregvm.Tool):
         parser.add_argument("--pagesize", default=None, help="pagination size")
 
     @classmethod
-    def help_epilog(cls) -> Optional[str]:
+    def help_epilog(cls) -> str | None:
         text = ''
         global_colnames = moregvm.GLOBAL_COLUMNS.keys()
         for restype in moregvm.COLUMNS:
             colnames = moregvm.COLUMNS[restype].keys()
             line = f"{restype}: {' '.join(global_colnames)} {' '.join(colnames)}"
             text += "\n" + textwrap.fill(line, width=100, initial_indent=' '*2, subsequent_indent=' '*4)
-        return super().help_epilog().replace('[PLACEHOLDER]', text)
+        raw_epilog = super().help_epilog() or '[PLACEHOLDER]'
+        return raw_epilog.replace('[PLACEHOLDER]', text)
 
     def tool_main(self) -> None:
         global debug, quiet, status
@@ -129,4 +128,3 @@ class GbQuerytool(moregvm.Tool):
 
 if __name__ == '__main__':
     GbQuerytool.run_from_sysargs()
-

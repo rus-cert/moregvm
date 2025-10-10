@@ -1,32 +1,34 @@
-from abc import ABC
-from typing import Dict, Tuple, Optional, Any
 import argparse
 import inspect
 import json
 import os
 import sys
+from abc import ABC
+from typing import Any
 
-import gvm.protocols.gmp
 import gvm.connections
 import gvm.errors
+import gvm.protocols.gmp
 import gvm.transforms
+
 import moregvm.exceptions
 
 CREDENTIAL_FILENAME = ".config/moregvm-credentials.json"
 DEFAULT_TIMEOUT = 180
 
-class LazyTool(ABC):
-    args: Dict[str, Any]
-    user: Optional[str]
-    gmp_hostname: Optional[str]
-    gmp: Optional[gvm.protocols.gmp.GMPv226]
 
-    def __init__(self, args):
+class LazyTool(ABC):
+    args: dict[str, Any]
+    user: str | None
+    gmp_hostname: str | None
+    gmp: gvm.protocols.gmp.GMPv226 | None
+
+    def __init__(self, args: dict[str, Any]):
         self.args = args
         self.user = None
         self.gmp = None
 
-    def tool_main(self):
+    def tool_main(self) -> None:
         raise NotImplementedError("Missing tool_main() method.")
 
     def connect(self):
@@ -58,7 +60,7 @@ class LazyTool(ABC):
             raise
         self.gmp = gmp
 
-    def output(self, *items: object, sep=' '):
+    def output(self, *items: object, sep: str = " ") -> None:
         """
         a simple output function
 
@@ -68,7 +70,7 @@ class LazyTool(ABC):
         """
         print(*items, sep=sep)
 
-    def errprint(self, *args: object, sep=' ', end='\n') -> None:
+    def errprint(self, *args: object, sep: str = " ", end: str = "\n") -> None:
         """print() but for stderr"""
         print(*args, file=sys.stderr, sep=sep, end=end, flush=True)
 
@@ -80,7 +82,7 @@ class LazyTool(ABC):
         raise NotImplementedError("Missing description. Either override the help_description method or give a docstring")
 
     @classmethod
-    def help_epilog(cls) -> Optional[str]:
+    def help_epilog(cls) -> str | None:
         doc = inspect.getdoc(cls)
         if doc:
             arr = doc.split('\n\n', 1)
@@ -89,7 +91,7 @@ class LazyTool(ABC):
         return None
 
     @classmethod
-    def required_args(cls) -> Dict[str, str]:
+    def required_args(cls) -> dict[str, str]:
         """
         These will get added into argparse as positional string arguments
         Return a dict of {name: description}
@@ -97,7 +99,7 @@ class LazyTool(ABC):
         return dict()
 
     @classmethod
-    def toggles(cls) -> Dict[str, str]:
+    def toggles(cls) -> dict[str, str]:
         """
         Boolean toggles that will get added into argparse as --arg
         Return a dict of {name: description}
@@ -105,7 +107,7 @@ class LazyTool(ABC):
         return dict()
 
     @classmethod
-    def option_args(cls) -> Dict[str, Tuple[str, object]]:
+    def option_args(cls) -> dict[str, tuple[str, object]]:
         """
         Optional args which will get added into argparse as --arg=value
         Return a dict of {name: (description, default_value)}
@@ -144,7 +146,7 @@ class LazyTool(ABC):
         return parser
 
     @classmethod
-    def run_from_sysargs(cls):
+    def run_from_sysargs(cls) -> None:
         try:
             parser = cls.make_argparser()
             namespace = parser.parse_args()
@@ -162,15 +164,16 @@ class LazyTool(ABC):
             sys.excepthook = lambda x,y,z: None # supress stack trace
             raise
 
+
 class Tool(LazyTool):
     user: str
     gmp: gvm.protocols.gmp.GMPv226
-    def __init__(self, args):
+    def __init__(self, args: dict[str, Any]):
         super().__init__(args)
         self.connect()
 
 
-def load_json(name: str):
+def load_json(name: str) -> dict[str, Any]:
     path = os.path.join(os.environ['HOME'], name)
     if os.path.exists(path):
         with open(path, 'r') as cfg:

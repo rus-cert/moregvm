@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-import sys
 import argparse
-from typing import Dict, List, Set, cast
+import sys
+from typing import cast
 
-import lxml.etree
+import gvm.xml
 
 import moregvm
+
 
 class GbExportIps(moregvm.Tool):
     """
@@ -24,12 +25,12 @@ class GbExportIps(moregvm.Tool):
 
     def tool_main(self) -> None:
         filterstring = self.args["filterstring"]
-        options: Dict[str, object] = {}
+        options: dict[str, object] = {}
 
         resource_iter = moregvm.resources_gen(self, "result", filterstring, options, self.args["pagesize"])
-        ips: Set[str] = set()
+        ips: set[str] = set()
         for resource in resource_iter:
-            hosts = cast(List[lxml.etree._Element], resource.xpath("host"))
+            hosts = cast(list[gvm.xml.Element], resource.xpath("host"))
             for element in hosts:
                 if not element.text:
                     raise moregvm.InternalError("Greenbone returned a result with an empty host")

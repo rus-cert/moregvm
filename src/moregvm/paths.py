@@ -1,49 +1,76 @@
 import re
-from typing import Any
 from abc import ABC, abstractmethod
+from typing import Any
+
+import gvm.xml
+
 
 class AbstractPath(ABC):
-    @abstractmethod
-    def extract(self, xml):
-        ...
+    """Represents a way to extract a piece of information from a result XML object."""
 
-# Utility Classes
+    @abstractmethod
+    def extract(self, xml: gvm.xml.Element) -> str | None: ...
+
+
 class SimplePathText(AbstractPath):
-    def __init__(self, path):
+    """Inner text of an element"""
+
+    def __init__(self, path: str):
         self.path = path
-    def extract(self, xml):
+
+    def extract(self, xml: gvm.xml.Element) -> str | None:
         el = xml.find(self.path)
         return None if el is None else el.text
+
+
 class SimplePathAttr(AbstractPath):
-    def __init__(self, path, attr):
+    """Specific attribute of an element"""
+
+    def __init__(self, path: str, attr: str):
         self.path = path
         self.attr = attr
-    def extract(self, xml):
+
+    def extract(self, xml: gvm.xml.Element) -> str | None:
         el = xml.find(self.path)
-        if el is None: return None
-        return None if self.attr not in el.attrib else el.attrib[self.attr]
+        if el is None or self.attr not in el.attrib:
+            return None
+        return str(el.attrib[self.attr])
+
+
 class SplitTagsPath(AbstractPath):
-    def __init__(self, path, attr):
+    """Split the inner text of an element (greenbone-specific pipe-separated format)"""
+
+    def __init__(self, path: str, attr: str):
         self.path = path
         self.attr = attr
-        self.pattern = re.compile(fr'(?:^|\|){self.attr}=([^|]*)(?:$|\|)')
-    def extract(self, xml):
+        self.pattern = re.compile(rf"(?:^|\|){self.attr}=([^|]*)(?:$|\|)")
+
+    def extract(self, xml: gvm.xml.Element) -> str | None:
         el = xml.find(self.path)
-        if el is None: return None
+        if el is None or el.text is None:
+            return None
         match = self.pattern.search(el.text)
         return None if match is None else match.group(1)
+
+
 class FanPathText(AbstractPath):
-    def __init__(self, path, attr):
+    """Extract from key-value structure <x><name>key</name><value>value</value></x>"""
+
+    def __init__(self, path: str, key: str):
         self.path = path
-        self.attr = attr
-    def extract(self, xml):
+        self.key = key
+
+    def extract(self, xml: gvm.xml.Element) -> str | None:
         el = xml.find(self.path)
-        if el is None: return None
+        if el is None:
+            return None
         for detail in el:
             name = detail.find("./name")
-            if name is not None and self.attr == name.text:
-                return detail.find("./value").text
+            value = detail.find("./value")
+            if name is not None and self.key == name.text:
+                return None if value is None else value.text
         return None
+
 
 # Constants
 GLOBAL_COLUMNS = {

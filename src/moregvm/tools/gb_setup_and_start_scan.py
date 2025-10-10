@@ -3,10 +3,9 @@
 import json
 import os
 
-import moregvm
+from gvm.protocols.gmp.requests.v226 import AliveTest, HostsOrdering
 
-from gvm.protocols.gmp.requests.v224 import HostsOrdering
-from gvm.protocols.gmp.requests.v224 import AliveTest
+import moregvm
 
 CONFIG_FILENAME = ".config/gb-tools-default-values.json"
 
@@ -14,7 +13,7 @@ CONFIG_VALUES = {
     "portlist": "UUID of greenbone port list",
     "scanner": "UUID of greenbone scanner",
     "scanconfig": "UUID of greenbone scan config",
-    "alivetest": "Name of alive test (e.g. 'ICMP Ping')"
+    "alivetest": "Name of alive test (e.g. 'ICMP Ping')",
 }
 
 def read_config():
@@ -83,4 +82,3 @@ class GbSetupAndStartScan(moregvm.Tool):
 
 if __name__ == '__main__':
     GbSetupAndStartScan.run_from_sysargs()
-

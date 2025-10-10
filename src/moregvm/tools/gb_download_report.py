@@ -4,12 +4,12 @@ import json
 import os
 import sys
 import uuid
-import xml.etree.ElementTree as ET
-
-import moregvm
-
 from base64 import b64decode
 from pathlib import Path
+
+import lxml.etree
+
+import moregvm
 
 CONFIG_FILENAME = ".config/gb-tools-report-format-ids_v2.json"
 DEFAULT_FORMAT_ID = "1fb9036c-1439-11eb-9d5d-b05cda5b0faa"
@@ -101,22 +101,24 @@ class GbDownloadReport(moregvm.Tool):
 
         if 'XML' in report_format:
             file_path = Path(filename)
-            xml_report = ET.tostring(report_element, encoding='utf-8').decode()
-            if filename == '-':
+            xml_report = lxml.etree.tostring(report_element, encoding="utf-8").decode()
+            if filename == "-":
                 self.output(xml_report)
             elif os.path.exists(file_path):
                 if self.args["force"]:
-                    output = open(str(file_path), "w") 
+                    output = open(str(file_path), "w")
                     output.write(xml_report)
-                    output.close() 
-                    print('Done. File created: ' + str(file_path))
+                    output.close()
+                    print("Done. File created: " + str(file_path))
                 else:
-                    raise moregvm.PermanentError("File already exists. Use --force or -f to overwrite.")
+                    raise moregvm.PermanentError(
+                        "File already exists. Use --force or -f to overwrite."
+                    )
             else:
-                output = open(str(file_path), "w") 
+                output = open(str(file_path), "w")
                 output.write(xml_report)
-                output.close() 
-                print('Done. File created: ' + str(file_path))
+                output.close()
+                print("Done. File created: " + str(file_path))
         else:
             content = report_element.find("report_format").tail
             if not content:

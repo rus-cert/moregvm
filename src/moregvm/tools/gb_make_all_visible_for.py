@@ -2,12 +2,12 @@
 
 import sys
 
+from gvm.protocols.gmp.requests.v226 import EntityType, PermissionSubjectType
+
 import moregvm
 
-from gvm.protocols.gmp.requests.v224 import EntityType, PermissionSubjectType
-from typing import Set
+PAGESIZE = 25
 
-PAGESIZE=25
 
 class GbMakeAllVisibleFor(moregvm.Tool):
     """
@@ -22,8 +22,9 @@ class GbMakeAllVisibleFor(moregvm.Tool):
         return {
             "resource_type": "Type of resource (override or note)",
             "principal_type": "Type of subject principal (user, group, role)",
-            "principal_id": "UUID of the subject user, group or role"
+            "principal_id": "UUID of the subject user, group or role",
         }
+
     @classmethod
     def toggles(cls):
         return {
@@ -31,7 +32,7 @@ class GbMakeAllVisibleFor(moregvm.Tool):
             "really-change": "Actually change state instead of a dry run",
         }
 
-    def _find_all_resource_ids(self, restype: str, username: str) -> Set[str]:
+    def _find_all_resource_ids(self, restype: str, username: str) -> set[str]:
         ids = set()
 
         filter_string = f'sort=uuid owner={username}'
@@ -134,6 +135,7 @@ class GbMakeAllVisibleFor(moregvm.Tool):
                     self.gmp.delete_permission(permid)
         if not really_change:
             print('Re-run with --really-change to apply the above changes (if any).')
+
 
 if __name__ == '__main__':
     GbMakeAllVisibleFor.run_from_sysargs()

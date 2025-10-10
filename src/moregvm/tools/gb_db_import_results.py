@@ -2,27 +2,27 @@
 
 import argparse
 import collections
-import sys
 import os
+import sys
+from typing import cast
+
+import gvm.errors
 import psycopg2
 from psycopg2 import sql
-import gvm.errors
 
 import moregvm
 
-from typing import Dict
-
-from typing import cast
 # Globals
-debug=False
-quiet=False
-status=False
+debug = False
+quiet = False
+status = False
 
 DEFAULT_FILTERSTRING = "apply_overrides=1 sort=created rows=-1 notes=0"
 NVT_COLUMNS = [
     "nvt_oid", "nvt_name", "nvt_family", "nvt_tags", "nvt_solution", "nvt_cvss_base_vector", "nvt_summary",
     "nvt_insight", "nvt_affected", "nvt_impact", "nvt_vuldetect", "nvt_solution_type"
 ]
+
 
 class GbDbImportResults(moregvm.Tool):
     """
