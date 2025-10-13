@@ -3,7 +3,7 @@ CREATE TABLE mg_meta (
     id INTEGER GENERATED ALWAYS AS (1) STORED PRIMARY KEY,
     schema_version INTEGER NOT NULL
 );
-INSERT INTO mg_meta (schema_version) VALUES (6);
+INSERT INTO mg_meta (schema_version) VALUES (8);
 
 ----- mg_users: Every entry is associated with a user -----
 CREATE TABLE mg_users (
@@ -250,10 +250,14 @@ SELECT * FROM mg_raw_reports WHERE sync_vanished IS NULL;
 
 CREATE VIEW mg_view_results AS
 SELECT
+    mg_users.name AS user,
+    mg_raw_reports.task_uuid,
+    mg_raw_reports.task_name,
     mg_raw_results.id,
     mg_raw_results.sync_found,
     mg_raw_results.sync_vanished,
     mg_raw_results.sync_user,
+    mg_syncdata_results.date AS sync_time,
     mg_raw_results.uuid,
     mg_raw_results.created,
     mg_raw_results.modified,
@@ -282,6 +286,7 @@ SELECT
     mg_raw_results.qod_value,
     mg_raw_results_e_description.description,
     mg_raw_results.report_uuid,
+    mg_raw_reports.name AS report_name,
     mg_raw_results.detection_product,
     mg_raw_results.detection_method,
     mg_raw_results.detection_oid
@@ -290,4 +295,11 @@ FROM mg_raw_results
         ON mg_raw_results.e_description_id = mg_raw_results_e_description.id
     JOIN mg_raw_results_e_nvt
         ON mg_raw_results.e_nvt_id = mg_raw_results_e_nvt.id
+    JOIN mg_users
+        ON mg_raw_results.sync_user = mg_users.id
+    JOIN mg_syncdata_results
+        ON mg_raw_results.sync_found = mg_syncdata_results.id
+    JOIN mg_raw_reports
+        ON mg_raw_reports.sync_vanished IS NULL
+        AND mg_raw_results.report_uuid = mg_raw_reports.uuid
 WHERE mg_raw_results.sync_vanished IS NULL;
