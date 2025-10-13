@@ -1,4 +1,5 @@
 reset_dev_db
+src/moregvm/config/local
 
 __pycache__/
 *.py[codz]
@@ -6,3 +7,15 @@ __pycache__/
 dist/
 sdist/
 *.egg-info/
+
+.venv
+.mypy_cache
+
+*~
+*.swp
+.idea/
+tags
+TAGS
+.vs/
+.vscode/
+.theia/

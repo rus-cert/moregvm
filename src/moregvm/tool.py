@@ -1,6 +1,5 @@
 import argparse
 import inspect
-import json
 import os
 import sys
 from abc import ABC
@@ -11,9 +10,9 @@ import gvm.errors
 import gvm.protocols.gmp
 import gvm.transforms
 
+import moregvm.config
 import moregvm.exceptions
 
-CREDENTIAL_FILENAME = ".config/moregvm-credentials.json"
 DEFAULT_TIMEOUT = 180
 
 
@@ -35,27 +34,39 @@ class LazyTool(ABC):
         """
         establish the connection to greenbone
         """
+        credentials = moregvm.config.credentials()
+
+        self.gmp_hostname = credentials["hostname"]
+        if not self.gmp_hostname:
+            raise moregvm.exceptions.PermanentError(
+                f"hostname not configured in ~/.config/{moregvm.config.CREDENTIAL_FILENAME}. "
+                "Refer to moregvm README.md for instructions on configuration."
+            )
+
+        default_user = credentials["default_user"]
         if not self.args.get("user") and "GBUSER" in os.environ:
-            # TODO temporary for migrating away from the GBUSER env var
-            self.errprint("Warning: Use specified via GBUSER env var. Please specify the user with --user instead")
-            self.args["user"] = os.environ["GBUSER"]
-        if not self.args.get("user"):
-            self.errprint("Warning: No user specified, defaulting to 'dev'. Please specify a user with --user")
-            self.user = "dev"
+            # TODO migrating away from the GBUSER env var - this is temporarily a fatal error to catch any place where it would misbehave. any references to GBUSER are likely to be deleted soon
+            raise moregvm.exceptions.PermanentError(
+                "User specified with GBUSER environment variable. This is no loger supported."
+            )
+        elif not self.args.get("user"):
+            self.errprint(f"Warning: No user specified, defaulting to '{default_user}'. Please specify a user with --user")
+            self.user = default_user
         else:
             self.user = self.args["user"]
 
-        cred_json = load_json(CREDENTIAL_FILENAME)
-        if self.user not in cred_json["users"]:
-            raise moregvm.exceptions.PermanentError(f"unknown user {self.user}")
+        if self.user not in credentials["users"]:
+            raise moregvm.exceptions.PermanentError(
+                f"User '{self.user}' is not defined. If the username seems correct, make sure"
+                f"it is defined in ~/.config/{moregvm.config.CREDENTIAL_FILENAME}."
+            )
 
-        self.gmp_hostname = cred_json["hostname"]
         conn = gvm.connections.SSHConnection(hostname=self.gmp_hostname, timeout=self.args["gmp_timeout"])
         gmp = gvm.protocols.gmp.GMPv226(conn, transform=gvm.transforms.EtreeCheckCommandTransform())
         gmp.connect()
         try:
-            gmp.authenticate(self.user, cred_json["users"][self.user])
-        except gvm.errors.GvmError as e:
+            gmp.authenticate(self.user, credentials["users"][self.user])
+        except gvm.errors.GvmError:
             self.errprint("Authentication failed!")
             raise
         self.gmp = gmp
@@ -171,12 +182,3 @@ class Tool(LazyTool):
     def __init__(self, args: dict[str, Any]):
         super().__init__(args)
         self.connect()
-
-
-def load_json(name: str) -> dict[str, Any]:
-    path = os.path.join(os.environ['HOME'], name)
-    if os.path.exists(path):
-        with open(path, 'r') as cfg:
-            return json.load(cfg)
-    else:
-        return {}

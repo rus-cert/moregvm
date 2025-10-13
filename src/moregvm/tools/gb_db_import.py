@@ -2,21 +2,21 @@
 
 import argparse
 import sys
-import os
-import psycopg2
+from collections import ChainMap
+from typing import cast
+
 from psycopg2 import sql
 
 import moregvm
 
-from collections import ChainMap
-from typing import Any, cast
 # Constants
 allowed_types = ["note", "override", "task", "report"]
 
 # Globals
-debug=False
-quiet=False
-status=False
+debug = False
+quiet = False
+status = False
+
 
 class GbDbImport(moregvm.Tool):
     """
@@ -47,10 +47,6 @@ class GbDbImport(moregvm.Tool):
             else:
                 raise moregvm.PermanentError(f'Currently only the types {allowed_types} are supported')
 
-        dsn = None
-        if "RUSCERTGB_DSN" in os.environ:
-            dsn = os.environ["RUSCERTGB_DSN"]
-
         name = self.user
 
         # columns
@@ -67,11 +63,15 @@ class GbDbImport(moregvm.Tool):
                                                 "", options,
                                                 self.args["pagesize"], debug, status)
         # commit is implicit, the connection is the context manager
-        with psycopg2.connect(dsn) as conn:
+        with moregvm.db_connect() as conn:
             with conn.cursor() as curs:
                 curs.execute("SELECT id FROM mg_users WHERE name = (%s)", (name,))
                 match curs.rowcount:
-                    case 0: curs.execute("INSERT INTO mg_users (name) VALUES (%s) RETURNING id", (name,))
+                    case 0:
+                        curs.execute(
+                            "INSERT INTO mg_users (name) VALUES (%s) RETURNING id",
+                            (name,),
+                        )
                     case 1: pass
                     case _: raise moregvm.InternalError(
                             f"SELECT on mg_users returned {curs.rowcount} rows. Expected 0 or 1.")
@@ -168,5 +168,6 @@ class GbDbImport(moregvm.Tool):
                 curs.execute(updating_query)
                 curs.execute(inserting_query)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     GbDbImport.run_from_sysargs()

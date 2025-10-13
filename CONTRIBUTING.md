@@ -8,7 +8,7 @@ Pull requests for small fixes are accepted.
 If you wish to contribute new scripts or other larger changes, please contact the author(s) beforehand to ensure that your planned changes are in line with the further plans.
 
 The autoformatter of choice is [_Black_][Black].
-Please only reformat new code and avoid rreformatting any code that wasn't added pull requests.
+In pull requests, please only format new code and avoid reformatting large swaths of code that wasn't otherwise edited.
 
 Please ensure that any newly added code
 * passes mypy type checking,

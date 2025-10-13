@@ -34,6 +34,42 @@ $ . .venv/bin/activate
 $ gb_export_ips --help
 ```
 
+## Greenbone credentials configuration
+
+To configure access to your greenbone instance/appliance, place a file like this under `$HOME/.config/moregvm-credentials.json`:
+
+```json
+{
+  "hostname": "gb.example.com",
+  "default_user": "user1",
+  "users": {
+    "user1": "password1",
+    "user2": "password2"
+  }
+}
+```
+
+You can omit `default_user`, it will default to `dev`.
+
+## Database configuration
+
+If you want to use the `gb_db_*` tools, you need to configure access to a Postgres database under `$HOME/.config/moregvm-database.json`:
+
+```json
+{
+    "dsn": "dbname=test user=postgres password=secret"
+}
+```
+
+The value for `dsn` needs to be specified as a [libpq connection string].
+You can skip the database config entirely if connections with an empty dsn work in your setup.
+Typically an empty dsn works if:
+* database name, database username and unix username are identical
+* Postgres runs locally
+* the unix user can access the postgres socket file and unix credential authentication is enabled
+
+[libpq connection string]: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
+
 ## Status for the included tools
 
 `moregvm` is a project mostly developed for in-house use by the maintainer(s).

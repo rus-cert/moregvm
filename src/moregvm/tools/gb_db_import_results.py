@@ -2,12 +2,10 @@
 
 import argparse
 import collections
-import os
 import sys
 from typing import cast
 
 import gvm.errors
-import psycopg2
 from psycopg2 import sql
 
 import moregvm
@@ -44,17 +42,11 @@ class GbDbImportResults(moregvm.Tool):
         (debug, quiet) = (self.args["debug"], self.args["quiet"])
         status = not quiet and not debug and sys.stderr.isatty()
 
-        dsn = None
-        if "RUSCERTGB_DSN" in os.environ:
-            dsn = os.environ["RUSCERTGB_DSN"]
-
         name = self.user
 
         # columns
         available_cols = collections.ChainMap(moregvm.COLUMNS["result"], moregvm.GLOBAL_COLUMNS)
         columns = list(available_cols.keys())
-
-        options = dict(moregvm.OPTIONS["result"])
 
         if status: moregvm.progress_indicator(0, "get_reports")
         try:
@@ -74,11 +66,15 @@ class GbDbImportResults(moregvm.Tool):
             self.errprint(f"greenbone returned report with {len(results)} results")
 
         # commit is implicit, the connection is the context manager
-        with psycopg2.connect(dsn) as conn:
+        with moregvm.db_connect() as conn:
             with conn.cursor() as curs:
                 curs.execute("SELECT id FROM mg_users WHERE name = (%s)", (name,))
                 match curs.rowcount:
-                    case 0: curs.execute("INSERT INTO mg_users (name) VALUES (%s) RETURNING id", (name,))
+                    case 0:
+                        curs.execute(
+                            "INSERT INTO mg_users (name) VALUES (%s) RETURNING id",
+                            (name,),
+                        )
                     case 1: pass
                     case _: raise moregvm.InternalError(
                             f"SELECT on mg_users returned {curs.rowcount} rows. Expected 0 or 1.")
@@ -272,5 +268,5 @@ class GbDbImportResults(moregvm.Tool):
                 curs.execute(inserting_query)
                 if status: moregvm.progress_indicator_erase()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     GbDbImportResults.run_from_sysargs()

@@ -1,4 +1,5 @@
 from moregvm.argparse import separated_list
+from moregvm.db import db_connect, db_cursor
 from moregvm.exceptions import InternalError, PermanentError, TemporaryError
 from moregvm.paths import (COLUMNS, GLOBAL_COLUMNS, OPTIONS, AbstractPath,
                            SimplePathAttr, SimplePathText)
@@ -10,6 +11,9 @@ __version__ = "0.0.1"
 __all__ = [
     # moregvm.argparse
     "separated_list",
+    # moregvm.db
+    "db_connect",
+    "db_cursor",
     # moregvm.exceptions
     "InternalError",
     "PermanentError",
