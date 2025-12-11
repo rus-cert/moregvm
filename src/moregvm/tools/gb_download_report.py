@@ -13,7 +13,7 @@ import moregvm
 
 CONFIG_FILENAME = ".config/gb-tools-report-format-ids_v2.json"
 DEFAULT_FORMAT_ID = "1fb9036c-1439-11eb-9d5d-b05cda5b0faa"
-DEFAULT_FILTERSTRING = "apply_overrides=1 min_qod=70 sort-reverse=severity rows=-1 levels=hml notes=0 overrides=0"
+DEFAULT_FILTERSTRING = "apply_overrides=1 min_qod=70 sort-reverse=severity rows=-1 levels=chml notes=0 overrides=0"
 
 def is_valid_uuid(value):
     try:
