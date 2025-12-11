@@ -194,6 +194,40 @@ Example:
     $ gb_make_all_visible_for override group 72dbb441-8c96-41b4-939d-7bfc28dd6e6d
 ```
 
+## gb_merge_reports
+```
+usage: gb_merge_reports [-h] [--user USER] [--force] [-f] [-t] [-o OUTPUT]
+                        reports [reports ...]
+
+Merge several reports into one
+
+positional arguments:
+  reports              Reports to merge
+
+options:
+  -h, --help           show this help message and exit
+  --user USER          Greenbone username
+  --force              Combine --output with --force to overwrite a file
+  -f, --file           Read the reports locally from files
+  -t, --task           Use task names instead of report UUIDs
+  -o, --output OUTPUT  Destination for merged report. Defaults to '-' for stdout
+
+The 'reports' argument is to be specified as:
+    * report UUIDs
+    * task name (with -t/--task)
+    * paths to files (with -f/--file)
+    * '-' for standard input (with -f/--file)
+
+This tool outputs XML to standard output unless --output is given. It pairs well
+with the gb_upload_report tool.
+
+Examples:
+    $ gb_merge_reports 12345678-1234-1234-1234-1234567890ab 12345678-1234-1234-1234-1234567890ab
+    $ gb_merge_reports -f ./first.xml ./second.xml
+    $ gb_merge_reports -t uni-2510-SAMPLE uni-2510-SAMPLE2
+    $ gb_merge_reports --user=u1 -t TASK1 TASK2 | gb_upload_report --user=u2 -n NEWTASK
+```
+
 ## gb_query_report
 ```
 usage: gb_query_report [-h] [--user USER] [-q] [-d] [-f] [-t] [--fenced]
@@ -370,6 +404,30 @@ options:
 
 Example:
     $ gb_task_status d34a201e-cf36-4a38-bcfe-811c43c65622
+```
+
+## gb_upload_report
+```
+usage: gb_upload_report [-h] [--user USER] [-n] [-i INPUT] task_name
+
+Upload a report to a container task
+
+positional arguments:
+  task_name          Name of the container task to upload the report into
+
+options:
+  -h, --help         show this help message and exit
+  --user USER        Greenbone username
+  -n, --new          Create a new container task by that name
+  -i, --input INPUT  Input file. Defaults to '-' for stdin.
+
+This tool reads XML from standard output unless --input is given. It pairs well
+with the gb_merge_reports and gb_download_report tools.
+
+Examples:
+    $ zcat archived_report.xml.gz | gb_upload_report "target task"
+    $ gb_upload_report -i ./file.xml "target task"
+    $ gb_merge_reports --user=u1 -t TASK1 TASK2 | gb_upload_report --user=u2 -n NEWTASK
 ```
 
 ## gb_web_filter

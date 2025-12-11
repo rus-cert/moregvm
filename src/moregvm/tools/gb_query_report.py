@@ -111,7 +111,7 @@ class GbQueryReport(moregvm.LazyTool):
             if self.gmp is None:
                 raise moregvm.InternalError("GMP connection not established")
             if self.args["task"]:
-                task = self.gmp.get_tasks(filter_string=f"name={self.args['report']}")
+                task = self.gmp.get_tasks(filter_string=f'name="{self.args['report']}"')
                 if task.xpath('task_count/filtered')[0].text != "0":
                     last_report_id = task.xpath('./task/last_report/report')[0].attrib['id']
                     report = self.gmp.get_report(report_id=last_report_id, filter_string=DEFAULT_FILTERSTRING)

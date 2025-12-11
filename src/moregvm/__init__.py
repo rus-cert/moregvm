@@ -5,7 +5,8 @@ from moregvm.paths import (COLUMNS, GLOBAL_COLUMNS, OPTIONS, AbstractPath,
                            SimplePathAttr, SimplePathText)
 from moregvm.progind import progress_indicator, progress_indicator_erase
 from moregvm.query import output_obj_by_name, output_obj_names, resources_gen
-from moregvm.tool import LazyTool, Tool
+from moregvm.tool import (DictOptionArgs, DictRequiredArgs, DictToggles,
+                          LazyTool, Tool)
 
 __version__ = "0.0.1"
 __all__ = [
@@ -33,6 +34,9 @@ __all__ = [
     "output_obj_names",
     "resources_gen",
     # morergvm.tool
+    "DictOptionArgs",
+    "DictRequiredArgs",
+    "DictToggles",
     "LazyTool",
     "Tool",
 ]

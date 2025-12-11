@@ -57,7 +57,7 @@ If you want to use the `gb_db_*` tools, you need to configure access to a Postgr
 
 ```json
 {
-    "dsn": "dbname=test user=postgres password=secret"
+  "dsn": "dbname=test user=postgres password=secret"
 }
 ```
 
@@ -89,16 +89,18 @@ An overview:
 | gb_export_ips            | 🟡     |
 | gb_get_report_format_ids | 🔴     |
 | gb_make_all_visible_for  | 🟢     |
+| gb_merge_reports         | 🟡     |
 | gb_query_report          | 🟡     |
 | gb_querytool             | 🟢     |
 | gb_report_status         | 🟡     |
 | gb_setup_and_start_scan  | 🟢     |
 | gb_status_summary        | 🟡     |
 | gb_task_status           | 🟡     |
+| gb_upload_report         | 🟡     |
 | gb_web_filter            | 🟢     |
 
 | Status | Details |
 | :----: | ------- |
-| 🟢     | In active use by the upstream maintainer(s). Any bugs arre likely to receive timely fixes. |
+| 🟢     | In active use by the upstream maintainer(s). Any bugs are likely to receive timely fixes. |
 | 🟡     | Rarely used. Bugs are more likely. |
 | 🔴     | Not in use by the upstream maintainer(s). Bugs likely. Bug reports unlikely to be processed unless accompanied by a pull request that includes a fix. |

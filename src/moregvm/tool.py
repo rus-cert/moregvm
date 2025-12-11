@@ -15,6 +15,10 @@ import moregvm.exceptions
 
 DEFAULT_TIMEOUT = 180
 
+DictRequiredArgs = dict[str, str]
+DictToggles = dict[str | tuple[str, str], str]
+DictOptionArgs = dict[str | tuple[str, str], tuple[str, object]]
+
 
 class LazyTool(ABC):
     args: dict[str, Any]
@@ -89,7 +93,7 @@ class LazyTool(ABC):
     def help_description(cls) -> str:
         doc = inspect.getdoc(cls)
         if doc:
-            return doc.split('\n\n', 1)[0] # first paragraph
+            return doc.split('\n\n', 1)[0]  # first paragraph
         raise NotImplementedError("Missing description. Either override the help_description method or give a docstring")
 
     @classmethod
@@ -102,26 +106,26 @@ class LazyTool(ABC):
         return None
 
     @classmethod
-    def required_args(cls) -> dict[str, str]:
+    def required_args(cls) -> DictRequiredArgs:
         """
         These will get added into argparse as positional string arguments
-        Return a dict of {name: description}
+        Return a dict of {name:description}
         """
         return dict()
 
     @classmethod
-    def toggles(cls) -> dict[str, str]:
+    def toggles(cls) -> DictToggles:
         """
-        Boolean toggles that will get added into argparse as --arg
-        Return a dict of {name: description}
+        Boolean toggles that will get added into argparse as --arg.
+        Return a dict of {name:description} or {(letter,name):description}
         """
         return dict()
 
     @classmethod
-    def option_args(cls) -> dict[str, tuple[str, object]]:
+    def option_args(cls) -> DictOptionArgs:
         """
-        Optional args which will get added into argparse as --arg=value
-        Return a dict of {name: (description, default_value)}
+        Optional args which will get added into argparse as '--arg=value' and optionally '-a value'
+        Return a dict of {name:(description,default)} or {(letter,name):(description,default)}
         The special default value ... means that the argument has no default and is required
         """
         return dict()
@@ -144,13 +148,16 @@ class LazyTool(ABC):
         parser.add_argument("--user", help="Greenbone username", action="store")
         parser.add_argument("--gmp-timeout", help=argparse.SUPPRESS, type=int, default=DEFAULT_TIMEOUT, metavar="TIME")
         for name, description in cls.toggles().items():
-            parser.add_argument("--" + name, help=description, action="store_true")
+            # name can either be "opt" or ("o","opt") to have a short version
+            names = ["--" + name] if type(name) is str else ["-" + name[0], "--" + name[1]]
+            parser.add_argument(*names, help=description, action="store_true")
         for name, argtuple in cls.option_args().items():
             description, default = argtuple
+            names = ["--" + name] if type(name) is str else ["-" + name[0], "--" + name[1]]
             if default == ...:
-                parser.add_argument("--" + name, help=description, action="store")
+                parser.add_argument(*names, help=description, action="store")
             else:
-                parser.add_argument("--" + name, help=description, action="store", default=default)
+                parser.add_argument(*names, help=description, action="store", default=default)
         for name, description in cls.required_args().items():
             parser.add_argument(name, help=description)
         cls.custom_args(parser)
