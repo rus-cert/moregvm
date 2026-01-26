@@ -14,20 +14,20 @@ For convenience, the following scripts are provided:
 * `setup_local.bash`  
   Creates a local venv in the directory `.venv` and installs this package plus all dependencies there using pip.
 * `setup_local_unisolated.bash`  
-  Same as `create_local.bash` but access to system site packages is allowed.
-  Use this if you want to use system packages to avoid building everything from source.
+  Same as `create_local.bash` but system site packages will be used where possible rather than installing all dependencies from PyPI.
+  Use this if you want to use system packages to avoid building everything from source (see next section).
 
-### Example on Debian-like distributions
+### Example: Getting started quickly
 
-Builing psycopg2 from source requires pg_config, a C toolchain and python as well as postgresql development headers.
-To avoid this and use system versions:
+It may be undesirable to install everything from pip beacuse building psycopg2 from source requires a C toolchain, pg_config as well as python and postgresql development headers.
+To avoid this and use system versions instead (package names in this example are from Debian):
 
 ```terminal
 $ sudo apt install python3-all-venv python3-setuptools python3-psycopg2
 $ ./setup_local_unisolated.bash
 ```
 
-To use, you can either directly call the scripts from the .venv/bin/gb_* directory or:
+To use, you can either directly call the scripts from the .venv/bin/gb_* directory or let the venv activate script set your PATH:
 
 ```terminal
 $ . .venv/bin/activate
@@ -36,7 +36,7 @@ $ gb_export_ips --help
 
 ## Greenbone credentials configuration
 
-To configure access to your greenbone instance/appliance, place a file like this under `$HOME/.config/moregvm-credentials.json`:
+To configure access to your greenbone instance/appliance, place credentials in the file `$HOME/.config/moregvm-credentials.json`:
 
 ```json
 {
@@ -53,7 +53,7 @@ You can omit `default_user`, it will default to `dev`.
 
 ## Database configuration
 
-If you want to use the `gb_db_*` tools, you need to configure access to a Postgres database under `$HOME/.config/moregvm-database.json`:
+If you wish to use the `gb_db_*` tools, you may need to configure access to a Postgres database under `$HOME/.config/moregvm-database.json`:
 
 ```json
 {
@@ -61,8 +61,10 @@ If you want to use the `gb_db_*` tools, you need to configure access to a Postgr
 }
 ```
 
-The value for `dsn` needs to be specified as a [libpq connection string].
-You can skip the database config entirely if connections with an empty dsn work in your setup.
+Psycopg2 expects the connection information as a _data source name_, `dsn`.
+Its value needs to be specified as a [libpq connection string].
+
+You can _skip_ the database config entirely if connections with an empty dsn work in your setup.
 Typically an empty dsn works if:
 * database name, database username and unix username are identical
 * Postgres runs locally
@@ -70,12 +72,16 @@ Typically an empty dsn works if:
 
 [libpq connection string]: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
 
-## Status for the included tools
+## Usage notes
+
+Some code in this project assumes that names of some OpenVAS resources (e.g. tasks, targets, filters) are unique among all resources of that type which can be seen by the current user.
+Please note that OpenVAS does not enforce uniqueness of all names and conflicts may lead to unexpected behavior.
 
 `moregvm` is a project mostly developed for in-house use by the maintainer(s).
-The project only receives limited development time and resources.
-Not all included tools are maintained equally well.
-An overview:
+The project only receives limited development time and resources and the included tools receive different levels of testing and maintenance.
+Refer to the following section for details:
+
+### Status of included tools
 
 | Name                     | Status |
 | ------------------------ | ------ |

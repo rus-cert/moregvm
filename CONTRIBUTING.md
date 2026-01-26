@@ -5,7 +5,7 @@ The project only receives limited development time and resources.
 
 Pull requests for small fixes are accepted.
 
-If you wish to contribute new scripts or other larger changes, please contact the author(s) beforehand to ensure that your planned changes are in line with the further plans.
+If you wish to contribute new scripts or other larger changes, please contact the maintainer(s) beforehand to ensure that your planned changes are in line with the project's general direction.
 
 The autoformatter of choice is [_Black_][Black].
 In pull requests, please only format new code and avoid reformatting large swaths of code that wasn't otherwise edited.
