@@ -58,6 +58,12 @@ class GbSetupAndStartScan(moregvm.Tool):
                 result[name] = (description, ...)
         return result
 
+    @classmethod
+    def toggles(cls):
+        return {
+            "overwrite": "Try deleting a target if one already exists with a conflicting name"
+        }
+
     def tool_main(self) -> None:
         target_name = self.args["target_name"]
         hosts_ip = split_hosts_ip(self.args["hosts_ip"])
@@ -65,6 +71,22 @@ class GbSetupAndStartScan(moregvm.Tool):
         alivetest = self.args["alivetest"]
         scanconfig = self.args["scanconfig"]
         scanner = self.args["scanner"]
+        overwrite = self.args["overwrite"]
+
+        # conflicting target name handling
+        get_targets_r = self.gmp.get_targets(
+            filter_string=f'name="{target_name}"'
+        )
+        if get_targets_r.xpath("target_count/filtered")[0].text != "0":
+            if overwrite:
+                old_target_id = get_targets_r.xpath('target')[0].attrib['id']
+                self.output(f"deleting conflicting target {old_target_id}")
+                self.gmp.delete_target(old_target_id)
+            else:
+                raise moregvm.PermanentError(
+                    f"Target '{target_name}' already exists in user "
+                    f"'{self.user}' and you didn't pass --overwrite."
+                )
 
         target = self.gmp.create_target(name=target_name, hosts=hosts_ip, port_list_id=portlist, alive_test=AliveTest(alivetest))
         target_id = target.attrib['id']
