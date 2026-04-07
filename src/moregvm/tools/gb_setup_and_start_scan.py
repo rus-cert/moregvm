@@ -91,7 +91,7 @@ class GbSetupAndStartScan(moregvm.Tool):
         target = self.gmp.create_target(name=target_name, hosts=hosts_ip, port_list_id=portlist, alive_test=AliveTest(alivetest))
         target_id = target.attrib['id']
 
-        task = self.gmp.create_task(name=target_name, config_id=scanconfig, target_id=target_id, scanner_id=scanner, alterable=True, hosts_ordering=HostsOrdering.RANDOM, schedule_id=None)
+        task = self.gmp.create_task(name=target_name, config_id=scanconfig, target_id=target_id, scanner_id=scanner, alterable=True, schedule_id=None)
 
         task_id = task.attrib['id']
         started_task = self.gmp.start_task(task_id=task_id)
